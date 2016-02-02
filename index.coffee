@@ -14,21 +14,39 @@ convertCsvToJson = (csvRegions) ->
     }
   regions # Done, return regions
 
+# Returns an array of objects with one object returned
+findAndRemove = (arr, val, property = 'numeric_code') ->
+  arr.forEach (res, i) -> if res[property] == val then arr.splice i, 1
 
-findCountry = (latitde, longitude) ->
+findClosestRegions = (regions, key, value) ->
+  closestObjects = [] # To be populated and returned
+  i = 0
+  while i < 8
+    closest = regions.reduce((prev, curr) ->
+      if Math.abs(curr[key] - value) < Math.abs(prev[key] - value) then curr else prev
+    )
+    closestObjects.push closest  # Push the object the the results array
+    findAndRemove regions, closest.numeric_code  # So we don't find it again
+    i++
+  closestObjects  # Return completed closest objects
+
+
+findCountry = (lat, lng) ->
 
   # Inject regions from CSV file
   csvRegions = fs.readFileSync(__dirname + '/regions.csv', 'utf8').split('\r\n')
 
   # Convert regions to JSON
   regions = convertCsvToJson csvRegions
-  console.log regions
 
   # Make list ordered by closest lat
-#  regions.sort (a, b) -> parseFloat(a.freq) - parseFloat(b.freq)
 
-# Make list ordered by closes lng
-  # Find LCD
+  console.log findClosestRegions regions, 'latitude', lat
+  console.log findClosestRegions regions, 'longitude', lng
+
+
+
+#  console.log regions
 
 
 
