@@ -14,24 +14,8 @@ convertCsvToJson = (csvRegions) ->
     }
   regions # Done, return regions
 
-# Returns an array of objects with one object returned
-findAndRemove = (arr, val, property = 'numeric_code') ->
-  arr.forEach (res, i) -> if res[property] == val then arr.splice i, 1
-
-findClosestRegions = (regions, key, value) ->
-  closestObjects = [] # To be populated and returned
-  i = 0
-  while i < 8
-    closest = regions.reduce((prev, curr) ->
-      if Math.abs(curr[key] - value) < Math.abs(prev[key] - value) then curr else prev
-    )
-    closestObjects.push closest  # Push the object the the results array
-    findAndRemove regions, closest.numeric_code  # So we don't find it again
-    i++
-  closestObjects  # Return completed closest objects
-
-
-findCountry = (lat, lng) ->
+# Returns a region object closest to a given latitude and longitude
+findRegion = (lat, lng) ->
 
   # Inject regions from CSV file
   csvRegions = fs.readFileSync(__dirname + '/regions.csv', 'utf8').split('\r\n')
@@ -39,30 +23,18 @@ findCountry = (lat, lng) ->
   # Convert regions to JSON
   regions = convertCsvToJson csvRegions
 
-  # Make list ordered by closest lat
+  # Find difference between our location and region location
+  for r in regions
+    r.diff= Math.round(Math.abs(r.latitude - lat) + Math.abs(r.longitude - lng))
 
-  console.log findClosestRegions regions, 'latitude', lat
-  console.log findClosestRegions regions, 'longitude', lng
+  # Sort regions by closest first
+  regions.sort (a, b) -> parseFloat(a.diff) - parseFloat(b.diff)
 
+  regions[0] # Return closest region
 
-
-#  console.log regions
-
-
-
-_private = {
-#  arrayifySentence: arrayifySentence
-#  formatWordsArr:   formatWordsArr
-#  formatSentence:   formatSentence
-#  removeDuplicates: removeDuplicates
-}
-
-
-module.exports.findCountry = findCountry
-
-# If we're developing/ testing then export the private methods too
-if process.env.NODE_ENV == 'test'
-  module.exports = {
-    main: removeWords
-    _private: _private
-  }
+# Create and export functions
+module.exports.country      = (lat, lng) -> findRegion(lat, lng).country
+module.exports.alpha2_code  = (lat, lng) -> findRegion(lat, lng).alpha2_code
+module.exports.alpha3_code  = (lat, lng) -> findRegion(lat, lng).alpha3_code
+module.exports.numeric_code = (lat, lng) -> findRegion(lat, lng).numeric_code
+module.exports.regionObject = findRegion
