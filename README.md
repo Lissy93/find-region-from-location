@@ -1,4 +1,6 @@
 # find-region-from-location 
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/Lissy93/find-region-from-location.svg)](https://greenkeeper.io/)
 [![Build Status](https://travis-ci.org/Lissy93/find-region-from-location.svg?branch=master)](https://travis-ci.org/Lissy93/find-region-from-location)
 [![Dependency Status](https://david-dm.org/lissy93/find-region-from-location.svg)](https://david-dm.org/lissy93/find-region-from-location)
 [![devDependency Status](https://david-dm.org/lissy93/find-region-from-location/dev-status.svg)](https://david-dm.org/lissy93/find-region-from-location#info=devDependencies)
